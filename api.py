@@ -1,10 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from google import genai
 from pydantic import BaseModel
+
+from gemini_service import generate_answer
 
 
 app = FastAPI(title="Nutrition AI Assistant")
-client = genai.Client()
 
 
 class QuestionRequest(BaseModel):
@@ -27,14 +27,11 @@ def ask_gemini(request: QuestionRequest) -> dict[str, str]:
         )
 
     try:
-        response = client.models.generate_content(
-            model="gemini-3.1-flash-lite",
-            contents=question,
-        )
+        answer = generate_answer(question)
 
         return {
             "question": question,
-            "answer": response.text or "",
+            "answer": answer,
         }
 
     except Exception as error:
